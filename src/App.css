@@ -1,38 +1,45 @@
 .App {
   text-align: center;
+  position: relative; /* Ensures the content is within the same stacking context */
+  height: 100vh;
+  width: 100%;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('./images/background.jpg');
+  background-size: cover;
+  z-index: 1; /* Background is behind the obstacles */
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.game-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 2; /* Obstacles are above the background */
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.obstacle {
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  z-index: 3; /* Obstacles are on top of the background */
+}
+
+.runner {
+  font-size: 50px;
+  position: absolute;
+  bottom: 50%;
+  left: 10%;
+  transition: bottom 0.5s ease-out;
+  z-index: 3; /* Runner is on top of the background */
 }

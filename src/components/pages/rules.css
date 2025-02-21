@@ -1,0 +1,149 @@
+/* Rules page container */
+.rules-page .rules-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: url("../../images/background.jpg") no-repeat center center fixed;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Center content vertically and horizontally */
+    filter: brightness(70%);
+  }
+  
+  /* Semi-transparent overlay for better visibility */
+  .rules-page .overlay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    height: 90%; /* Reduce height to avoid overflow */
+    width: 90%; /* Allow some padding around the content */
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+    padding: 30px;
+    box-sizing: border-box;
+    border-radius: 15px; /* Rounded corners for the container */
+    overflow-y: auto; /* Allow scrolling for large content */
+    animation: fadeIn 1.5s ease-in-out;
+  }
+  
+  /* Title styling */
+  .rules-page .rules-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-align: center;
+    width: 100%;
+    animation: fadeIn 1.5s ease-in-out;
+  }
+  
+  /* Content styling */
+  .rules-page .rules-content {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    text-align: left;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 700px;
+    padding: 15px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+    animation: fadeIn 2s ease-in-out;
+  }
+  
+  /* List Styling */
+  .rules-page .rules-content ul {
+    list-style-type: none;
+    margin: 15px 0;
+    padding-left: 0;
+  }
+  
+  .rules-page .rules-content li {
+    margin-bottom: 12px;
+    position: relative;
+    padding-left: 25px;
+  }
+  
+  .rules-page .rules-content li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 1.5rem;
+    color: #ff6600;
+  }
+  
+  /* Button styling */
+  .rules-page .back-button {
+    padding: 12px 30px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: white;
+    background-color: #ff6600;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    margin-top: 20px;
+  }
+  
+  .rules-page .back-button:hover {
+    transform: scale(1.1);
+    background-color: #e65c00;
+    box-shadow: 0 8px 14px rgba(0, 0, 0, 0.4);
+  }
+  
+  .rules-page .back-button:active {
+    transform: scale(0.95);
+  }
+  
+  /* Fade-in animation */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .rules-page .rules-title {
+      font-size: 2rem;
+    }
+  
+    .rules-page .rules-content {
+      font-size: 1rem;
+    }
+  
+    .rules-page .back-button {
+      font-size: 1rem;
+      padding: 10px 25px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .rules-page .rules-title {
+      font-size: 1.5rem;
+    }
+  
+    .rules-page .rules-content {
+      font-size: 0.9rem;
+    }
+  
+    .rules-page .back-button {
+      font-size: 0.9rem;
+      padding: 8px 20px;
+    }
+  }
+  
