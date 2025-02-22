@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../../App.css";
-import back from "../../images/bg_litegreen.mp4";
+import back from "../../images/backgrou.mp4"; 
 import obstacle1 from "../../images/Obstacle_1.png";
 import obstacle2 from "../../images/Obstacle_2.png";
 import obstacle3 from "../../images/Obstacle_3.png";
@@ -12,20 +12,22 @@ import bgmusic from "../../images/bg_music.mp3";
 
 const obstacles = [obstacle1, obstacle2, obstacle3, obstacle4, obstacle5];
 
-// Level 5 specific words - mix of 4 and 5 letters
-const level5Words = [
-  // 4 letter words
-  "able", "bird", "calm", "dark", "echo", "find",
-  // 5 letter words
-  "alive", "brave", "claim", "dream", "extra"
-];
+// Level 7 specific words - mix of 4 and 5 letters, 25 words total
+const level7Words = [
+    // 6-letter words (7 words)
+    "impact", "fusion", "magnet", "beacon", "ripple", "strike", "puzzle",
+    // 7-letter words (7 words)
+    "venture", "journey", "resolve", "fragile", "freedom", "breeze", "harvest",
+    // 8-letter words (6 words)
+    "momentum", "explorer", "outreach", "vibrance", "catalyst", "insight"
+  ];
 
-function Level5Game() {
+function Level10Game() {
   const [obstacleList, setObstacleList] = useState([]);
   const [runnerPosition, setRunnerPosition] = useState(10);
   const [gameOver, setGameOver] = useState(false);
   const [typedWord, setTypedWord] = useState("");
-  const [timeLeft, setTimeLeft] = useState(45); // Reduced time for medium level
+  const [timeLeft, setTimeLeft] = useState(30); // 45 seconds for level 7
   const [currentWord, setCurrentWord] = useState("");
   const [jumping, setJumping] = useState(false);
   const [score, setScore] = useState(0);
@@ -34,15 +36,16 @@ function Level5Game() {
   const [allWordsCompleted, setAllWordsCompleted] = useState(false);
   const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
   const [comboMultiplier, setComboMultiplier] = useState(1);
-  const [obstacleSpeed, setObstacleSpeed] = useState(1.5); // Higher base speed for Level 5
+  const [obstacleSpeed, setObstacleSpeed] = useState(1.4); // REDUCED from 1.8 to 1.2
   const [levelUpdated, setLevelUpdated] = useState(false);
+  const currentLevel = 10;
 
   const videoRef = useRef(null);
   const runnerRef = useRef(null);
   const audioRef = useRef(null);
   const bgMusicRef = useRef(null);
 
-  // Database update function
+  // Update level in database
   const updateLevelInDatabase = async () => {
     try {
       const storedUsername = localStorage.getItem('username');
@@ -74,23 +77,13 @@ function Level5Game() {
     }
   };
 
-  // Update level in database when game is completed successfully
-  useEffect(() => {
-    const successRate = (score / (level5Words.length * 22.5)) * 100;
-    const levelPassed = successRate >= 115;
-    
-    if (gameOver && allWordsCompleted && levelPassed && !levelUpdated) {
-      updateLevelInDatabase();
-    }
-  }, [gameOver, allWordsCompleted, score, levelUpdated]);
-
   // Timer Effect
   useEffect(() => {
     if (timeLeft > 0 && !gameOver && !allWordsCompleted) {
       const timer = setInterval(() => {
         setTimeLeft((prevTime) => prevTime - 1);
-        // Faster speed increase for medium level
-        setObstacleSpeed(prev => Math.min(prev + 0.015, 2.5));
+        // Slower speed increase
+        setObstacleSpeed(prev => Math.min(prev + 0.015, 2.0)); // Reduced max speed from 3.0 to 2.0
       }, 1000);
       return () => clearInterval(timer);
     } else if (timeLeft <= 0 || allWordsCompleted) {
@@ -114,14 +107,14 @@ function Level5Game() {
 
     let currentIndex = 0;
     const interval = setInterval(() => {
-      if (currentIndex >= level5Words.length) {
+      if (currentIndex >= level7Words.length) {
         setAllWordsCompleted(true);
         clearInterval(interval);
         return;
       }
 
       const randomObstacle = obstacles[Math.floor(Math.random() * obstacles.length)];
-      const newWord = level5Words[currentIndex];
+      const newWord = level7Words[currentIndex];
       setCurrentWord(newWord);
 
       const newObstacle = {
@@ -134,10 +127,21 @@ function Level5Game() {
       };
       setObstacleList((prevObstacles) => [...prevObstacles, newObstacle]);
       currentIndex++;
-    }, 2000); // Faster spawn rate for medium level
+    }, 1700); // Even faster spawn rate for level 7
 
     return () => clearInterval(interval);
   }, [gameOver, allWordsCompleted]);
+
+  // Update level in database when game is completed successfully
+  useEffect(() => {
+    // Calculate success rate for level completion
+    const successRate = (score / (level7Words.length * 32.5)) * 100;
+    const levelPassed = successRate >= 150; // Higher threshold for level 7
+    
+    if (gameOver && allWordsCompleted && levelPassed && !levelUpdated) {
+      updateLevelInDatabase();
+    }
+  }, [gameOver, allWordsCompleted, score, levelUpdated]);
 
   // Obstacle Movement Effect
   useEffect(() => {
@@ -211,13 +215,13 @@ function Level5Game() {
     const newConsecutiveCorrect = consecutiveCorrect + 1;
     setConsecutiveCorrect(newConsecutiveCorrect);
     
-    // Enhanced combo system for Level 5
+    // Enhanced combo system for Level 7 - faster combo buildup
     if (newConsecutiveCorrect % 2 === 0) {
-      setComboMultiplier(prev => Math.min(prev + 1, 5));
+      setComboMultiplier(prev => Math.min(prev + 1.3, 6.5)); // Higher max multiplier for level 7
     }
     
-    // Higher base points for longer words
-    const basePoints = currentWord.length === 5 ? 25 : 20;
+    // Higher base points for longer words in level 7
+    const basePoints = currentWord.length === 5 ? 35 : 30;
     const pointsEarned = Math.floor(basePoints * comboMultiplier);
     setScore(prevScore => prevScore + pointsEarned);
     
@@ -225,7 +229,7 @@ function Level5Game() {
     setTimeout(() => setJumping(false), 500);
     setTypedWord("");
 
-    if (wordsCompleted + 1 === level5Words.length) {
+    if (wordsCompleted + 1 === level7Words.length) {
       setAllWordsCompleted(true);
     }
   };
@@ -252,7 +256,7 @@ function Level5Game() {
     setAllWordsCompleted(false);
     setConsecutiveCorrect(0);
     setComboMultiplier(1);
-    setObstacleSpeed(1.5);
+    setObstacleSpeed(1.4); // REDUCED from 1.8 to 1.2
     setLevelUpdated(false);
 
     if (videoRef.current) {
@@ -267,8 +271,9 @@ function Level5Game() {
     }
   };
 
-  const successRate = (score / (level5Words.length * 22.5)) * 100;
-  const levelPassed = successRate >= 115;
+  // Adjusted success rate calculation for level 7 (25 words with higher difficulty)
+  const successRate = (score / (level7Words.length * 32.5)) * 100;
+  const levelPassed = successRate >= 125; // Higher threshold for level 7
 
   // Button hover styles
   const buttonBaseStyle = {
@@ -320,7 +325,7 @@ function Level5Game() {
           top: "20px",
           left: "50%",
           transform: "translateX(-50%)",
-          color: "#4CAF50",
+          color: "#ff9800", // Changed to orange
           fontSize: "24px",
           fontWeight: "bold",
           textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
@@ -329,23 +334,7 @@ function Level5Game() {
           borderRadius: "10px",
           zIndex: "1"
         }}>
-          Level 5 - Medium
-        </div>
-
-        {/* Difficulty Indicator */}
-        <div style={{
-          position: "absolute",
-          top: "170px",
-          right: "20px",
-          color: "#4CAF50",
-          fontSize: "18px",
-          fontWeight: "bold",
-          background: "rgba(0,0,0,0.7)",
-          padding: "10px",
-          borderRadius: "10px",
-          zIndex: "1"
-        }}>
-          Word Length: {currentWord.length} letters
+          Level 9 - Hard
         </div>
 
         {/* Speed Display */}
@@ -353,7 +342,7 @@ function Level5Game() {
           position: "absolute",
           top: "120px",
           right: "20px",
-          color: obstacleSpeed > 2 ? "#ff4444" : "#4CAF50",
+          color: obstacleSpeed > 1.7 ? "#4caf50" : "#ff9800", // Changed to green/orange
           fontSize: "20px",
           fontWeight: "bold",
           background: "rgba(0,0,0,0.7)",
@@ -364,29 +353,28 @@ function Level5Game() {
           Speed: {obstacleSpeed.toFixed(1)}x
         </div>
 
-        {/* Combo Display */}
+        {/* Progress Indicator */}
         <div style={{
           position: "absolute",
-          top: "70px",
+          top: "170px",
           right: "20px",
-          color: comboMultiplier > 1 ? "#4CAF50" : "white",
-          fontSize: "20px",
+          color: "white",
+          fontSize: "18px",
           fontWeight: "bold",
           background: "rgba(0,0,0,0.7)",
           padding: "10px",
           borderRadius: "10px",
-          zIndex: "1",
-          animation: comboMultiplier > 1 ? "pulse 1s infinite" : "none"
+          zIndex: "1"
         }}>
-          Combo: x{comboMultiplier.toFixed(1)}
+          Progress: {wordsCompleted}/{level7Words.length}
         </div>
 
-        {/* Stats Display */}
+        {/* Stats Display - Only Timer remains in sidebar */}
         <div style={{
           position: "absolute",
           top: "20px",
           right: "20px",
-          color: timeLeft <= 15 ? "#ff4444" : "white",
+          color: timeLeft <= 15 ? "#ff4500" : "#ffffff", // Orange when low time
           fontSize: "20px",
           fontWeight: "bold",
           background: "rgba(0,0,0,0.7)",
@@ -426,17 +414,17 @@ function Level5Game() {
           <span style={{
             display: "inline-block",
             padding: "5px 15px",
-            background: "linear-gradient(to right, #4CAF50, #45a049)",
+            background: "linear-gradient(to right, #4caf50, #388e3c)", // Changed to green gradient
             borderRadius: "10px",
-            boxShadow: "0 0 10px rgba(76,175,80,0.8)",
+            boxShadow: "0 0 10px rgba(29, 145, 1, 0.34)",
             textShadow: "2px 2px 4px rgba(0,0,0,0.5)"
           }}>
             {currentWord.toUpperCase()}
           </span>
         </div>
 
-        {/* Input Field */}
-        <input
+       {/* Input Field */}
+       <input
           type="text"
           value={typedWord}
           onChange={handleInputChange}
@@ -449,8 +437,8 @@ function Level5Game() {
             padding: "10px",
             fontSize: "18px",
             borderRadius: "5px",
-            border: "2px solid #4CAF50",
-            background: "rgba(255,255,255,0.9)",
+            border: "2px solid #4CAF50", // Changed from blue to green
+            background: "rgba(255,255,255,1)", // Pure white background
             width: "200px",
             textAlign: "center",
             zIndex: "1",
@@ -460,7 +448,7 @@ function Level5Game() {
           disabled={gameOver}
           autoFocus
         />
-        
+
         {/* Game Over Screen */}
         {gameOver && (
           <div style={{
@@ -475,24 +463,23 @@ function Level5Game() {
             textAlign: "center",
             zIndex: "2"
           }}>
-            <h2 style={{ color: "#4CAF50" }}>{allWordsCompleted ? "Level Complete!" : "Game Over!"}</h2>
+            <h2 style={{ color: "#ff9800" }}>{allWordsCompleted ? "Level Complete!" : "Game Over!"}</h2>
             <p>Final Score: {score}</p>
-            <p>Words Completed: {wordsCompleted}/{level5Words.length}</p>
+            <p>Words Completed: {wordsCompleted}/{level7Words.length}</p>
             <p>Success Rate: {successRate.toFixed(1)}%</p>
             {levelPassed ? (
-              <p style={{ color: "#4CAF50" }}>
-                Level Passed! {levelUpdated ? "Progress saved!" : "Saving progress..."} 
-                You can proceed to Level 6!
+              <p style={{ color: "#4caf50" }}>
+                Congrautulations! You completed this game {levelUpdated ? "Progress saved!" : "Saving progress..."} 
+                You completed this game...🔥🎉
               </p>
             ) : (
-              <p style={{ color: "#ff4444" }}>Try again to achieve 115% success rate</p>
+              <p style={{ color: "#ff4500" }}>Try again to achieve 125% success rate</p>
             )}
             <button
               onClick={restartGame}
               style={{
                 ...buttonBaseStyle,
-                background: "linear-gradient(to right, #4CAF50, #45a049)",
-                ":hover": buttonHoverStyle
+                background: "linear-gradient(to right, #4caf50, #388e3c)", // Changed to green gradient
               }}
               onMouseEnter={e => {
                 e.target.style.transform = "translateY(-2px)";
@@ -508,11 +495,10 @@ function Level5Game() {
             {levelPassed && (
               <>
                 <button
-                  onClick={() => window.location.href = "/l6"}
+                  onClick={() => window.location.href = "/Profile"}
                   style={{
                     ...buttonBaseStyle,
-                    background: "linear-gradient(to right, #2196F3, #1976D2)",
-                    ":hover": buttonHoverStyle
+                    background: "linear-gradient(to right, #4caf50, #388e3c)", // Changed to green gradient
                   }}
                   onMouseEnter={e => {
                     e.target.style.transform = "translateY(-2px)";
@@ -523,14 +509,13 @@ function Level5Game() {
                     e.target.style.boxShadow = "none";
                   }}
                 >
-                  Next Level
+                  Profile
                 </button>
                 <button
                   onClick={() => window.location.href = "/levels"}
                   style={{
                     ...buttonBaseStyle,
-                    background: "linear-gradient(to right, #2196F3, #1976D2)",
-                    ":hover": buttonHoverStyle
+                    background: "linear-gradient(to right, #4caf50, #388e3c)", // Changed to green gradient
                   }}
                   onMouseEnter={e => {
                     e.target.style.transform = "translateY(-2px)";
@@ -549,8 +534,7 @@ function Level5Game() {
               onClick={() => window.location.href = "/home"}
               style={{
                 ...buttonBaseStyle,
-                background: "linear-gradient(to right, #ff9800, #f57c00)",
-                ":hover": buttonHoverStyle
+                background: "linear-gradient(to right, #ff9800, #f57c00)", // Orange gradient
               }}
               onMouseEnter={e => {
                 e.target.style.transform = "translateY(-2px)";
@@ -561,7 +545,7 @@ function Level5Game() {
                 e.target.style.boxShadow = "none";
               }}
             >
-              Main Menu
+              Home
             </button>
           </div>
         )}
@@ -579,7 +563,7 @@ function Level5Game() {
           >
             <div style={{
               textAlign: "center",
-              color: "#4CAF50",
+              color: "#ff9800", // Changed to orange
               fontSize: "20px",
               fontWeight: "bold",
               marginBottom: "120px",
@@ -639,10 +623,10 @@ function Level5Game() {
 
             @keyframes glow {
               from {
-                text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #4CAF50, 0 0 20px #4CAF50;
+                text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px rgb(68, 243, 33), 0 0 20px rgb(33, 243, 33);
               }
               to {
-                text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #4CAF50, 0 0 40px #4CAF50;
+                text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px rgb(85, 255, 7), 0 0 40px rgb(82, 243, 33);
               }
             }
 
@@ -654,7 +638,7 @@ function Level5Game() {
 
             .typing-input:focus {
               outline: none;
-              box-shadow: 0 0 10px #4CAF50;
+              box-shadow: 0 0 10px rgb(0, 0, 0);
               transform: scale(1.02);
             }
 
@@ -703,4 +687,4 @@ function Level5Game() {
   );
 }
 
-export default Level5Game;
+export default Level10Game;

@@ -385,7 +385,7 @@ function Level1() {
             {levelPassed && (
               <>
                 <button
-                  onClick={() => window.location.href = "l2"}
+                  onClick={() => window.location.href = "/l2"}
                   style={{
                     padding: "10px 20px",
                     margin: "10px",

@@ -12,11 +12,8 @@ import bgmusic from "../../images/bg_music.mp3";
 
 const obstacles = [obstacle1, obstacle2, obstacle3, obstacle4, obstacle5];
 
-// Level 6 specific words - mix of 4 and 5 letters, reduced to 20 words
 const level6Words = [
-  // 4 letter words
   "grid", "fuel", "swim", "task", "axis", "diet", "gaze",
-  // 5 letter words
   "climb", "focus", "trust", "blend", "drive", "float", "smart"];
 
 function Level6Game() {
@@ -24,18 +21,15 @@ function Level6Game() {
   const [runnerPosition, setRunnerPosition] = useState(10);
   const [gameOver, setGameOver] = useState(false);
   const [typedWord, setTypedWord] = useState("");
-  const [timeLeft, setTimeLeft] = useState(45); // 45 seconds for level 6
+  const [timeLeft, setTimeLeft] = useState(45);
   const [currentWord, setCurrentWord] = useState("");
   const [jumping, setJumping] = useState(false);
   const [score, setScore] = useState(0);
   const [wordsCompleted, setWordsCompleted] = useState(0);
   const [collisionAnimation, setCollisionAnimation] = useState(false);
   const [allWordsCompleted, setAllWordsCompleted] = useState(false);
-  const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
-  const [comboMultiplier, setComboMultiplier] = useState(1);
-  const [obstacleSpeed, setObstacleSpeed] = useState(1.2); // Reduced from 1.6 to 1.2
+  const [obstacleSpeed, setObstacleSpeed] = useState(1.2);
   const [levelUpdated, setLevelUpdated] = useState(false);
-  const currentLevel = 6;
 
   const videoRef = useRef(null);
   const runnerRef = useRef(null);
@@ -61,13 +55,9 @@ function Level6Game() {
       });
       
       const data = await response.json();
-      console.log("Level update response:", data);
       
       if (data.message === 'Level increased successfully') {
-        console.log(`Level increased to ${data.newLevel}`);
         setLevelUpdated(true);
-      } else {
-        console.error("Failed to update level:", data.message);
       }
     } catch (error) {
       console.error("Error updating level:", error);
@@ -79,8 +69,7 @@ function Level6Game() {
     if (timeLeft > 0 && !gameOver && !allWordsCompleted) {
       const timer = setInterval(() => {
         setTimeLeft((prevTime) => prevTime - 1);
-        // Slower speed increase for level 6
-        setObstacleSpeed(prev => Math.min(prev + 0.01, 2.0)); // Reduced max speed from 2.7 to 2.0
+        setObstacleSpeed(prev => Math.min(prev + 0.01, 2.0));
       }, 1000);
       return () => clearInterval(timer);
     } else if (timeLeft <= 0 || allWordsCompleted) {
@@ -90,9 +79,8 @@ function Level6Game() {
 
   // Update level in database when game is completed successfully
   useEffect(() => {
-    // Calculate success rate for level completion
     const successRate = (score / (level6Words.length * 27.5)) * 100;
-    const levelPassed = successRate >= 120; // Higher threshold for level 6
+    const levelPassed = successRate >= 120;
     
     if (gameOver && allWordsCompleted && levelPassed && !levelUpdated) {
       updateLevelInDatabase();
@@ -135,7 +123,7 @@ function Level6Game() {
       };
       setObstacleList((prevObstacles) => [...prevObstacles, newObstacle]);
       currentIndex++;
-    }, 2200); // Increased from 1800 to 2200 for slower spawn rate
+    }, 2200);
 
     return () => clearInterval(interval);
   }, [gameOver, allWordsCompleted]);
@@ -175,8 +163,6 @@ function Level6Game() {
 
         if (collisionDetected) {
           setCollisionAnimation(true);
-          setConsecutiveCorrect(0);
-          setComboMultiplier(1);
           setTimeout(() => {
             setCollisionAnimation(false);
             setGameOver(true);
@@ -209,19 +195,8 @@ function Level6Game() {
 
   const handleWordMatch = () => {
     setJumping(true);
-    const newConsecutiveCorrect = consecutiveCorrect + 1;
-    setConsecutiveCorrect(newConsecutiveCorrect);
-    
-    // Enhanced combo system for Level 6 - slower combo buildup
-    if (newConsecutiveCorrect % 2 === 0) {
-      setComboMultiplier(prev => Math.min(prev + 0.8, 4.0)); // Reduced from 1.2 to 0.8 and max from 6 to 4
-    }
-    
-    // Higher base points for longer words in level 6
     const basePoints = currentWord.length === 5 ? 30 : 25;
-    const pointsEarned = Math.floor(basePoints * comboMultiplier);
-    setScore(prevScore => prevScore + pointsEarned);
-    
+    setScore(prevScore => prevScore + basePoints);
     setWordsCompleted((prev) => prev + 1);
     setTimeout(() => setJumping(false), 500);
     setTypedWord("");
@@ -233,10 +208,6 @@ function Level6Game() {
 
   const handleInputChange = (event) => {
     setTypedWord(event.target.value);
-    if (event.nativeEvent.inputType === 'deleteContentBackward') {
-      setConsecutiveCorrect(Math.max(0, consecutiveCorrect - 1));
-      setComboMultiplier(Math.max(1, comboMultiplier - 0.5));
-    }
   };
 
   const restartGame = () => {
@@ -251,9 +222,7 @@ function Level6Game() {
     setWordsCompleted(0);
     setCollisionAnimation(false);
     setAllWordsCompleted(false);
-    setConsecutiveCorrect(0);
-    setComboMultiplier(1);
-    setObstacleSpeed(1.2); // Reset to lower starting speed
+    setObstacleSpeed(1.2);
     setLevelUpdated(false);
 
     if (videoRef.current) {
@@ -268,11 +237,9 @@ function Level6Game() {
     }
   };
 
-  // Adjusted success rate calculation for level 6 (20 words instead of 30)
   const successRate = (score / (level6Words.length * 27.5)) * 100;
-  const levelPassed = successRate >= 120; // Higher threshold for level 6
+  const levelPassed = successRate >= 120;
 
-  // Button hover styles
   const buttonBaseStyle = {
     padding: "10px 20px",
     margin: "10px",
@@ -281,11 +248,6 @@ function Level6Game() {
     color: "white",
     cursor: "pointer",
     transition: "all 0.3s ease",
-  };
-
-  const buttonHoverStyle = {
-    transform: "translateY(-2px)",
-    boxShadow: "0 5px 15px rgba(0,0,0,0.3)",
   };
 
   return (
@@ -297,7 +259,6 @@ function Level6Game() {
         margin: "0",
         overflow: "hidden",
       }}>
-        {/* Background Video */}
         <video
           ref={videoRef}
           autoPlay
@@ -316,13 +277,12 @@ function Level6Game() {
           <source src={back} type="video/mp4" />
         </video>
 
-        {/* Game Interface Elements */}
         <div style={{
           position: "absolute",
           top: "20px",
           left: "50%",
           transform: "translateX(-50%)",
-          color: "#3F51B5", // Different color for level 6
+          color: "#4CAF50",
           fontSize: "24px",
           fontWeight: "bold",
           textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
@@ -334,23 +294,6 @@ function Level6Game() {
           Level 6 - Medium
         </div>
 
-        {/* Difficulty Indicator */}
-        <div style={{
-          position: "absolute",
-          top: "170px",
-          right: "20px",
-          color: "#3F51B5",
-          fontSize: "18px",
-          fontWeight: "bold",
-          background: "rgba(0,0,0,0.7)",
-          padding: "10px",
-          borderRadius: "10px",
-          zIndex: "1"
-        }}>
-          Word Length: {currentWord.length} letters
-        </div>
-
-        {/* Progress Indicator */}
         <div style={{
           position: "absolute",
           top: "220px",
@@ -366,45 +309,11 @@ function Level6Game() {
           Progress: {wordsCompleted}/{level6Words.length}
         </div>
 
-        {/* Speed Display */}
-        <div style={{
-          position: "absolute",
-          top: "120px",
-          right: "20px",
-          color: obstacleSpeed > 1.8 ? "#ff4444" : "#3F51B5", // Changed threshold from 2.2 to 1.8
-          fontSize: "20px",
-          fontWeight: "bold",
-          background: "rgba(0,0,0,0.7)",
-          padding: "10px",
-          borderRadius: "10px",
-          zIndex: "1"
-        }}>
-          Speed: {obstacleSpeed.toFixed(1)}x
-        </div>
-
-        {/* Combo Display */}
-        <div style={{
-          position: "absolute",
-          top: "70px",
-          right: "20px",
-          color: comboMultiplier > 1 ? "#3F51B5" : "white",
-          fontSize: "20px",
-          fontWeight: "bold",
-          background: "rgba(0,0,0,0.7)",
-          padding: "10px",
-          borderRadius: "10px",
-          zIndex: "1",
-          animation: comboMultiplier > 1 ? "pulse 1s infinite" : "none"
-        }}>
-          Combo: x{comboMultiplier.toFixed(1)}
-        </div>
-
-        {/* Stats Display */}
         <div style={{
           position: "absolute",
           top: "20px",
           right: "20px",
-          color: timeLeft <= 15 ? "#ff4444" : "white",
+          color: timeLeft <= 15 ? "#ff6d00" : "white",
           fontSize: "20px",
           fontWeight: "bold",
           background: "rgba(0,0,0,0.7)",
@@ -430,7 +339,6 @@ function Level6Game() {
           Score: {score}
         </div>
 
-        {/* Current Word Display */}
         <div className="word-display" style={{
           position: "absolute",
           top: "70px",
@@ -444,16 +352,15 @@ function Level6Game() {
           <span style={{
             display: "inline-block",
             padding: "5px 15px",
-            background: "linear-gradient(to right, #3F51B5, #303F9F)",
+            background: "linear-gradient(to right, #4CAF50, #388E3C)",
             borderRadius: "10px",
-            boxShadow: "0 0 10px rgba(63,81,181,0.8)",
+            boxShadow: "0 0 10px rgba(76,175,80,0.8)",
             textShadow: "2px 2px 4px rgba(0,0,0,0.5)"
           }}>
             {currentWord.toUpperCase()}
           </span>
         </div>
 
-        {/* Input Field */}
         <input
           type="text"
           value={typedWord}
@@ -467,7 +374,7 @@ function Level6Game() {
             padding: "10px",
             fontSize: "18px",
             borderRadius: "5px",
-            border: "2px solid #3F51B5",
+            border: "2px solid #4CAF50",
             background: "rgba(255,255,255,0.9)",
             width: "200px",
             textAlign: "center",
@@ -479,7 +386,6 @@ function Level6Game() {
           autoFocus
         />
 
-        {/* Game Over Screen */}
         {gameOver && (
           <div style={{
             position: "absolute",
@@ -493,32 +399,23 @@ function Level6Game() {
             textAlign: "center",
             zIndex: "2"
           }}>
-            <h2 style={{ color: "#3F51B5" }}>{allWordsCompleted ? "Level Complete!" : "Game Over!"}</h2>
+            <h2 style={{ color: "#4CAF50" }}>{allWordsCompleted ? "Level Complete!" : "Game Over!"}</h2>
             <p>Final Score: {score}</p>
             <p>Words Completed: {wordsCompleted}/{level6Words.length}</p>
             <p>Success Rate: {successRate.toFixed(1)}%</p>
             {levelPassed ? (
-              <p style={{ color: "#3F51B5" }}>
+              <p style={{ color: "#4CAF50" }}>
                 Level Passed! {levelUpdated ? "Progress saved!" : "Saving progress..."} 
                 You can proceed to Level 7!
               </p>
             ) : (
-              <p style={{ color: "#ff4444" }}>Try again to achieve 120% success rate</p>
+              <p style={{ color: "#ff6d00" }}>Try again to achieve 120% success rate</p>
             )}
             <button
               onClick={restartGame}
               style={{
                 ...buttonBaseStyle,
-                background: "linear-gradient(to right, #3F51B5, #303F9F)",
-                ":hover": buttonHoverStyle
-              }}
-              onMouseEnter={e => {
-                e.target.style.transform = "translateY(-2px)";
-                e.target.style.boxShadow = "0 5px 15px rgba(0,0,0,0.3)";
-              }}
-              onMouseLeave={e => {
-                e.target.style.transform = "translateY(0)";
-                e.target.style.boxShadow = "none";
+                background: "linear-gradient(to right, #4CAF50, #388E3C)",
               }}
             >
               Retry Level
@@ -529,16 +426,7 @@ function Level6Game() {
                   onClick={() => window.location.href = "/l7"}
                   style={{
                     ...buttonBaseStyle,
-                    background: "linear-gradient(to right, #2196F3, #1976D2)",
-                    ":hover": buttonHoverStyle
-                  }}
-                  onMouseEnter={e => {
-                    e.target.style.transform = "translateY(-2px)";
-                    e.target.style.boxShadow = "0 5px 15px rgba(0,0,0,0.3)";
-                  }}
-                  onMouseLeave={e => {
-                    e.target.style.transform = "translateY(0)";
-                    e.target.style.boxShadow = "none";
+                    background: "linear-gradient(to right, #4CAF50, #388E3C)",
                   }}
                 >
                   Next Level
@@ -547,16 +435,7 @@ function Level6Game() {
                   onClick={() => window.location.href = "/levels"}
                   style={{
                     ...buttonBaseStyle,
-                    background: "linear-gradient(to right, #2196F3, #1976D2)",
-                    ":hover": buttonHoverStyle
-                  }}
-                  onMouseEnter={e => {
-                    e.target.style.transform = "translateY(-2px)";
-                    e.target.style.boxShadow = "0 5px 15px rgba(0,0,0,0.3)";
-                  }}
-                  onMouseLeave={e => {
-                    e.target.style.transform = "translateY(0)";
-                    e.target.style.boxShadow = "none";
+                    background: "linear-gradient(to right, #4CAF50, #388E3C)",
                   }}
                 >
                   Levels Page
@@ -567,16 +446,7 @@ function Level6Game() {
               onClick={() => window.location.href = "/home"}
               style={{
                 ...buttonBaseStyle,
-                background: "linear-gradient(to right, #ff9800, #f57c00)",
-                ":hover": buttonHoverStyle
-              }}
-              onMouseEnter={e => {
-                e.target.style.transform = "translateY(-2px)";
-                e.target.style.boxShadow = "0 5px 15px rgba(0,0,0,0.3)";
-              }}
-              onMouseLeave={e => {
-                e.target.style.transform = "translateY(0)";
-                e.target.style.boxShadow = "none";
+                background: "linear-gradient(to right, #ff9800, #ff6d00)",
               }}
             >
               Main Menu
@@ -584,7 +454,6 @@ function Level6Game() {
           </div>
         )}
 
-        {/* Obstacles */}
         {obstacleList.map((obstacle, index) => (
           <div
             key={index}
@@ -597,7 +466,7 @@ function Level6Game() {
           >
             <div style={{
               textAlign: "center",
-              color: "#3F51B5",
+              color: "#4CAF50",
               fontSize: "20px",
               fontWeight: "bold",
               marginBottom: "120px",
@@ -618,7 +487,6 @@ function Level6Game() {
           </div>
         ))}
 
-        {/* Runner */}
         <div
           ref={runnerRef}
           style={{
@@ -640,11 +508,9 @@ function Level6Game() {
           />
         </div>
 
-        {/* Audio Elements */}
         <audio ref={audioRef} src={jumpSound} preload="auto"></audio>
         <audio ref={bgMusicRef} src={bgmusic} loop preload="auto"></audio>
 
-        {/* Animation Styles */}
         <style>
           {`
             @keyframes shake {
@@ -657,10 +523,10 @@ function Level6Game() {
 
             @keyframes glow {
               from {
-                text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #3F51B5, 0 0 20px #3F51B5;
+                text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #4CAF50, 0 0 20px #4CAF50;
               }
               to {
-                text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #3F51B5, 0 0 40px #3F51B5;
+                text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #4CAF50, 0 0 40px #4CAF50;
               }
             }
 
@@ -672,7 +538,7 @@ function Level6Game() {
 
             .typing-input:focus {
               outline: none;
-              box-shadow: 0 0 10px #3F51B5;
+              box-shadow: 0 0 10px #4CAF50;
               transform: scale(1.02);
             }
 

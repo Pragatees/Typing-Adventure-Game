@@ -29,7 +29,7 @@ function Levels() {
         }
 
         const levelCount = userData.levelsCompleted;
-        
+
         if (levelCount === undefined || levelCount === null) {
           console.warn("levelsCompleted is missing or null, setting default value to 0");
           setUnlockedLevel(1);
@@ -68,7 +68,7 @@ function Levels() {
   };
 
   const renderLevelBox = (level) => (
-    <div onClick={() => handleLevelClick(level)}>
+    <div onClick={() => handleLevelClick(level)} style={{ position: 'relative' }}>
       <div className="box" style={{
         ...boxStyle,
         opacity: level > unlockedLevel ? 0.5 : 1,
@@ -76,8 +76,15 @@ function Levels() {
         position: 'relative'
       }}>
         Level {level}
+
+        {/* Lock Icon for Locked Levels */}
         {level > unlockedLevel && (
           <div style={lockIconStyle}>🔒</div>
+        )}
+
+        {/* Star Icon for Completed Levels */}
+        {level < unlockedLevel && (
+          <div style={starIconStyle}>⭐</div>
         )}
       </div>
     </div>
@@ -101,49 +108,19 @@ function Levels() {
 
       {/* Alert Message */}
       {showAlert && (
-        <div style={{
-          position: 'fixed',
-          top: '20px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          background: 'rgba(255, 0, 0, 0.8)',
-          color: 'white',
-          padding: '15px 30px',
-          borderRadius: '8px',
-          zIndex: 100,
-          boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
-          animation: 'fadeIn 0.3s ease-out'
-        }}>
+        <div style={alertStyle}>
           {alertMessage}
         </div>
       )}
 
-      <div className="content" style={{
-        height: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontFamily: `'Poppins', sans-serif`,
-        color: '#ffffff',
-        textShadow: '2px 2px 4px rgba(0, 0, 0, 0.7)',
-        position: 'relative',
-        zIndex: 1
-      }}>
-        <h1 style={{
-          marginBottom: '30px',
-          fontSize: '2.5rem',
-          fontWeight: 'bold',
-          animation: 'fadeIn 2s ease-in-out'
-        }}>
-          Select Your Level
-        </h1>
+      <div className="content" style={contentStyle}>
+        <h1 style={titleStyle}>Select Your Level</h1>
 
         <div className="box-container" style={{ display: 'flex', flexDirection: 'column' }}>
           {/* Easy Levels */}
           <div>
             <h2 style={{ color: '#90EE90' }}>Easy</h2>
-            <div className="row" style={{ display: 'flex', marginBottom: '15px' }}>
+            <div className="row" style={rowStyle}>
               {renderLevelBox(1)}
               {renderLevelBox(2)}
               {renderLevelBox(3)}
@@ -154,7 +131,7 @@ function Levels() {
           {/* Medium Levels */}
           <div>
             <h2 style={{ color: '#FFD700' }}>Medium</h2>
-            <div className="row" style={{ display: 'flex', marginBottom: '15px' }}>
+            <div className="row" style={rowStyle}>
               {renderLevelBox(5)}
               {renderLevelBox(6)}
               {renderLevelBox(7)}
@@ -165,7 +142,7 @@ function Levels() {
           {/* Hard Levels */}
           <div>
             <h2 style={{ color: '#FF6347' }}>Hard</h2>
-            <div className="row" style={{ display: 'flex', marginBottom: '15px' }}>
+            <div className="row" style={rowStyle}>
               {renderLevelBox(9)}
               {renderLevelBox(10)}
             </div>
@@ -180,6 +157,7 @@ function Levels() {
   );
 }
 
+// Styles
 const boxStyle = {
   width: '80px',
   height: '80px',
@@ -203,6 +181,53 @@ const lockIconStyle = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   fontSize: '1.5rem',
+};
+
+const starIconStyle = {
+  position: 'absolute',
+  bottom: '5px',
+  right: '5px',
+  fontSize: '1.2rem',
+  color: '#FFD700', // Gold color for the star
+};
+
+const alertStyle = {
+  position: 'fixed',
+  top: '20px',
+  left: '50%',
+  transform: 'translateX(-50%)',
+  background: 'rgba(255, 0, 0, 0.8)',
+  color: 'white',
+  padding: '15px 30px',
+  borderRadius: '8px',
+  zIndex: 100,
+  boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
+  animation: 'fadeIn 0.3s ease-out',
+};
+
+const contentStyle = {
+  height: '100vh',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontFamily: `'Poppins', sans-serif`,
+  color: '#ffffff',
+  textShadow: '2px 2px 4px rgba(0, 0, 0, 0.7)',
+  position: 'relative',
+  zIndex: 1,
+};
+
+const titleStyle = {
+  marginBottom: '30px',
+  fontSize: '2.5rem',
+  fontWeight: 'bold',
+  animation: 'fadeIn 2s ease-in-out',
+};
+
+const rowStyle = {
+  display: 'flex',
+  marginBottom: '15px',
 };
 
 const homeButtonStyle = {

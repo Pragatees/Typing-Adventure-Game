@@ -34,9 +34,9 @@ function Level7Game() {
   const [allWordsCompleted, setAllWordsCompleted] = useState(false);
   const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
   const [comboMultiplier, setComboMultiplier] = useState(1);
-  const [obstacleSpeed, setObstacleSpeed] = useState(1.2); // REDUCED from 1.8 to 1.2
+  const [obstacleSpeed, setObstacleSpeed] = useState(1.3); // REDUCED from 1.8 to 1.2
   const [levelUpdated, setLevelUpdated] = useState(false);
-  const currentLevel = 7;
+  const currentLevel = 8;
 
   const videoRef = useRef(null);
   const runnerRef = useRef(null);
@@ -134,7 +134,7 @@ function Level7Game() {
   useEffect(() => {
     // Calculate success rate for level completion
     const successRate = (score / (level7Words.length * 32.5)) * 100;
-    const levelPassed = successRate >= 125; // Higher threshold for level 7
+    const levelPassed = successRate >= 150; // Higher threshold for level 7
     
     if (gameOver && allWordsCompleted && levelPassed && !levelUpdated) {
       updateLevelInDatabase();
@@ -323,7 +323,7 @@ function Level7Game() {
           top: "20px",
           left: "50%",
           transform: "translateX(-50%)",
-          color: "#2196F3", // Different color for level 7
+          color: "#ff9800", // Changed to orange
           fontSize: "24px",
           fontWeight: "bold",
           textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
@@ -335,26 +335,26 @@ function Level7Game() {
           Level 7 - Advanced Medium
         </div>
 
-        {/* Difficulty Indicator */}
+        {/* Speed Display */}
         <div style={{
           position: "absolute",
-          top: "170px",
+          top: "120px",
           right: "20px",
-          color: "#2196F3",
-          fontSize: "18px",
+          color: obstacleSpeed > 1.7 ? "#4caf50" : "#ff9800", // Changed to green/orange
+          fontSize: "20px",
           fontWeight: "bold",
           background: "rgba(0,0,0,0.7)",
           padding: "10px",
           borderRadius: "10px",
           zIndex: "1"
         }}>
-          Word Length: {currentWord.length} letters
+          Speed: {obstacleSpeed.toFixed(1)}x
         </div>
 
         {/* Progress Indicator */}
         <div style={{
           position: "absolute",
-          top: "220px",
+          top: "170px",
           right: "20px",
           color: "white",
           fontSize: "18px",
@@ -367,45 +367,12 @@ function Level7Game() {
           Progress: {wordsCompleted}/{level7Words.length}
         </div>
 
-        {/* Speed Display */}
-        <div style={{
-          position: "absolute",
-          top: "120px",
-          right: "20px",
-          color: obstacleSpeed > 1.7 ? "#ff4444" : "#2196F3",
-          fontSize: "20px",
-          fontWeight: "bold",
-          background: "rgba(0,0,0,0.7)",
-          padding: "10px",
-          borderRadius: "10px",
-          zIndex: "1"
-        }}>
-          Speed: {obstacleSpeed.toFixed(1)}x
-        </div>
-
-        {/* Combo Display */}
-        <div style={{
-          position: "absolute",
-          top: "70px",
-          right: "20px",
-          color: comboMultiplier > 1 ? "#2196F3" : "white",
-          fontSize: "20px",
-          fontWeight: "bold",
-          background: "rgba(0,0,0,0.7)",
-          padding: "10px",
-          borderRadius: "10px",
-          zIndex: "1",
-          animation: comboMultiplier > 1 ? "pulse 1s infinite" : "none"
-        }}>
-          Combo: x{comboMultiplier.toFixed(1)}
-        </div>
-
-        {/* Stats Display */}
+        {/* Stats Display - Only Timer remains in sidebar */}
         <div style={{
           position: "absolute",
           top: "20px",
           right: "20px",
-          color: timeLeft <= 15 ? "#ff4444" : "white",
+          color: timeLeft <= 15 ? "#ff4500" : "#ffffff", // Orange when low time
           fontSize: "20px",
           fontWeight: "bold",
           background: "rgba(0,0,0,0.7)",
@@ -445,17 +412,17 @@ function Level7Game() {
           <span style={{
             display: "inline-block",
             padding: "5px 15px",
-            background: "linear-gradient(to right, #2196F3, #1976D2)", // Updated colors for level 7
+            background: "linear-gradient(to right, #4caf50, #388e3c)", // Changed to green gradient
             borderRadius: "10px",
-            boxShadow: "0 0 10px rgba(33,150,243,0.8)",
+            boxShadow: "0 0 10px rgba(29, 145, 1, 0.34)",
             textShadow: "2px 2px 4px rgba(0,0,0,0.5)"
           }}>
             {currentWord.toUpperCase()}
           </span>
         </div>
 
-        {/* Input Field */}
-        <input
+       {/* Input Field */}
+       <input
           type="text"
           value={typedWord}
           onChange={handleInputChange}
@@ -468,8 +435,8 @@ function Level7Game() {
             padding: "10px",
             fontSize: "18px",
             borderRadius: "5px",
-            border: "2px solid #2196F3", // Updated color for level 7
-            background: "rgba(255,255,255,0.9)",
+            border: "2px solid #4CAF50", // Changed from blue to green
+            background: "rgba(255,255,255,1)", // Pure white background
             width: "200px",
             textAlign: "center",
             zIndex: "1",
@@ -494,23 +461,23 @@ function Level7Game() {
             textAlign: "center",
             zIndex: "2"
           }}>
-            <h2 style={{ color: "#2196F3" }}>{allWordsCompleted ? "Level Complete!" : "Game Over!"}</h2>
+            <h2 style={{ color: "#ff9800" }}>{allWordsCompleted ? "Level Complete!" : "Game Over!"}</h2>
             <p>Final Score: {score}</p>
             <p>Words Completed: {wordsCompleted}/{level7Words.length}</p>
             <p>Success Rate: {successRate.toFixed(1)}%</p>
             {levelPassed ? (
-              <p style={{ color: "#2196F3" }}>
+              <p style={{ color: "#4caf50" }}>
                 Level Passed! {levelUpdated ? "Progress saved!" : "Saving progress..."} 
                 You can proceed to Level 8!
               </p>
             ) : (
-              <p style={{ color: "#ff4444" }}>Try again to achieve 125% success rate</p>
+              <p style={{ color: "#ff4500" }}>Try again to achieve 125% success rate</p>
             )}
             <button
               onClick={restartGame}
               style={{
                 ...buttonBaseStyle,
-                background: "linear-gradient(to right, #2196F3, #1976D2)", // Updated colors for level 7
+                background: "linear-gradient(to right, #4caf50, #388e3c)", // Changed to green gradient
               }}
               onMouseEnter={e => {
                 e.target.style.transform = "translateY(-2px)";
@@ -526,10 +493,10 @@ function Level7Game() {
             {levelPassed && (
               <>
                 <button
-                  onClick={() => window.location.href = "/level8"}
+                  onClick={() => window.location.href = "/l8"}
                   style={{
                     ...buttonBaseStyle,
-                    background: "linear-gradient(to right, #00BCD4, #0097A7)", // Different color for next level button
+                    background: "linear-gradient(to right, #4caf50, #388e3c)", // Changed to green gradient
                   }}
                   onMouseEnter={e => {
                     e.target.style.transform = "translateY(-2px)";
@@ -546,7 +513,7 @@ function Level7Game() {
                   onClick={() => window.location.href = "/levels"}
                   style={{
                     ...buttonBaseStyle,
-                    background: "linear-gradient(to right, #00BCD4, #0097A7)",
+                    background: "linear-gradient(to right, #4caf50, #388e3c)", // Changed to green gradient
                   }}
                   onMouseEnter={e => {
                     e.target.style.transform = "translateY(-2px)";
@@ -565,7 +532,7 @@ function Level7Game() {
               onClick={() => window.location.href = "/home"}
               style={{
                 ...buttonBaseStyle,
-                background: "linear-gradient(to right, #ff9800, #f57c00)",
+                background: "linear-gradient(to right, #ff9800, #f57c00)", // Orange gradient
               }}
               onMouseEnter={e => {
                 e.target.style.transform = "translateY(-2px)";
@@ -594,7 +561,7 @@ function Level7Game() {
           >
             <div style={{
               textAlign: "center",
-              color: "#2196F3", // Updated color for level 7
+              color: "#ff9800", // Changed to orange
               fontSize: "20px",
               fontWeight: "bold",
               marginBottom: "120px",
@@ -654,10 +621,10 @@ function Level7Game() {
 
             @keyframes glow {
               from {
-                text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #2196F3, 0 0 20px #2196F3;
+                text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px rgb(68, 243, 33), 0 0 20px rgb(33, 243, 33);
               }
               to {
-                text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #2196F3, 0 0 40px #2196F3;
+                text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px rgb(85, 255, 7), 0 0 40px rgb(82, 243, 33);
               }
             }
 
@@ -669,7 +636,7 @@ function Level7Game() {
 
             .typing-input:focus {
               outline: none;
-              box-shadow: 0 0 10px #2196F3;
+              box-shadow: 0 0 10px rgb(0, 0, 0);
               transform: scale(1.02);
             }
 

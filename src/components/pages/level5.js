@@ -485,7 +485,7 @@ function Level5Game() {
                 You can proceed to Level 6!
               </p>
             ) : (
-              <p style={{ color: "#ff4444" }}>Try again to achieve 115% success rate</p>
+              <p style={{ color: "#ff4444" }}>Try again to achieve 100% success rate</p>
             )}
             <button
               onClick={restartGame}
